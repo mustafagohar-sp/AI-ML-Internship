@@ -3,3 +3,12 @@ __pycache__/
 .ipynb_checkpoints/
 *.pyc
 .vscode/
+data/
+
+
+# Models
+*.pth
+
+**/data/
+*.tar.gz
+*.zip
