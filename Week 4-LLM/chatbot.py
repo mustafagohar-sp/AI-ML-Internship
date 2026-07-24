@@ -4,7 +4,6 @@ from prompts import SYSTEM_PROMPT
 import os
 import json
 
-# Load environment variables
 load_dotenv()
 
 # Get API key
