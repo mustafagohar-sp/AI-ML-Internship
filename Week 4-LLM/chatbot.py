@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from openai import OpenAI
+from prompts import SYSTEM_PROMPT
 import os
 
 load_dotenv()
@@ -18,14 +19,26 @@ client = OpenAI(
 if not api_key:
     raise ValueError("OPENROUTER_API_KEY not found in .env")
 
-response = client.chat.completions.create(
-    model="openrouter/auto",
-    messages=[
-        {
-            "role": "user",
-            "content": "Say hello in one sentence."
-        }
-    ]
-)
+while True:
 
-print(response.choices[0].message.content)
+    user_input = input("You: ")
+
+    if user_input.lower() == "exit":
+        print("Goodbye!")
+        break
+
+    response = client.chat.completions.create(
+        model="openrouter/auto",
+        messages=[
+            {
+                "role" : "system",
+                "content" : SYSTEM_PROMPT
+            },
+            {
+                "role": "user",
+                "content": user_input
+            }
+        ]
+    )
+
+    print("\nAssistant:", response.choices[0].message.content)
