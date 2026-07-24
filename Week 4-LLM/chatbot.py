@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from prompts import SYSTEM_PROMPT
 import os
+import json
 
 # Load environment variables
 load_dotenv()
@@ -19,12 +20,17 @@ client = OpenAI(
 )
 
 # Initialize conversation history with the system prompt
-messages = [
-    {
-        "role": "system",
-        "content": SYSTEM_PROMPT
-    }
-]
+try:
+    with open("history.json", "r") as file:
+        messages = json.load(file)
+
+except (FileNotFoundError, json.JSONDecodeError):
+    messages = [
+        {
+            "role": "system",
+            "content": SYSTEM_PROMPT
+        }
+    ]
 
 # Chat loop
 while True:
@@ -34,6 +40,43 @@ while True:
     if user_input.lower() == "exit":
         print("Goodbye!")
         break
+
+    # Handle /student command
+    if user_input.startswith("/student"):
+
+        parts = user_input.split()
+
+        if len(parts) != 3:
+            print("Usage: /student <name> <marks>")
+            continue
+
+        name = parts[1]
+
+        try:
+            marks = int(parts[2])
+        except ValueError:
+            print("Marks must be a number.")
+            continue
+
+        if marks >= 90:
+            grade = "A"
+        elif marks >= 80:
+            grade = "B"
+        elif marks >= 70:
+            grade = "C"
+        elif marks >= 60:
+            grade = "D"
+        else:
+            grade = "F"
+
+        student = {
+            "name": name,
+            "marks": marks,
+            "grade": grade
+        }
+
+        print(json.dumps(student, indent=4))
+        continue
 
     # Store user's message
     messages.append(
@@ -62,3 +105,6 @@ while True:
             "content": assistant_reply
         }
     )
+
+    with open("history.json", "w") as file:
+        json.dump(messages, file, indent=4)
